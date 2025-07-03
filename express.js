@@ -34,6 +34,23 @@ app.get('/reviews/:movieID', async(req, res) => {
     res.json(reviews)
 })
 
+app.get('/reviews/:movieID/average', async(req, res) => {
+    const { movieID } = req.params
+    if(!movieID){
+        return res.status(400).json({error: 'movieID가 필요합니다!'})
+    }
+    const reviews = await Review.find({ movieID })
+
+    var sum = 0
+    var cnt = 0
+    for (var movie of reviews){
+        cnt++
+        sum = sum + movie.rating
+    }
+    var average = sum/cnt
+    res.json({"average" : `${average}`})
+})
+
 
 app.listen(port, () => {
     console.log(`Server running on port ${port}`)
