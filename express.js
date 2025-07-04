@@ -11,6 +11,34 @@ const url = "mongodb+srv://tlatamus0203:3PV3ZAuEL6MrXkfr@cluster23.cyyuqox.mongo
 
 const Review = require('./models/reviews')
 const Movie = require('./models/movies')
+const Taste = require('./models/tastes')
+const MovieTaste = require('./models/movieTastes')
+// 처음 실행 전 반드시 movie/movieTaste 데이터 wipe 후 이용!!
+
+function updateTaste(movie, taste) {
+  if (movie.genres && Array.isArray(movie.genres)) {
+    movie.genres.forEach(genreObj => {
+      const genreName = genreObj.name
+      if (genreName in taste) {
+        taste[genreName] += 1
+      }
+    })
+  }
+}
+
+async function makeMovieTaste(movie, taste) {
+  if (movie.genres && Array.isArray(movie.genres)) {
+    var tasteRecord = 0
+    movie.genres.forEach(genreObj => {
+      const genreName = genreObj.name
+      if (genreName in taste) {
+        tasteRecord += taste[genreName]
+      }
+    })
+    const movieTaste = new MovieTaste({taste : tasteRecord, movie : movie})
+    const savedMovieTaste = await movieTaste.save()
+  }
+}
 
 mongoose.connect(url)
     .then(() => console.log('MongoDB connected'))
@@ -71,6 +99,48 @@ app.post('/movies', async(req, res) => {
     }
 })
 
+app.get('/movies/delete', async (req, res) => {
+    await Movie.deleteMany({})
+    res.json({"status" : "delete complete"})
+})
+
+app.get('/movies/recommend', async (req, res) => {
+    await MovieTaste.deleteMany({})
+    const taste = new Taste({
+        Action: 1,
+        Adventure: 1,
+        Animation: 1,
+        Comedy: 1,
+        Crime: 1,
+        Documentary: 1,
+        Drama: 1,
+        Family: 1,
+        Fantasy: 1,
+        History: 1,
+        Horror: 1,
+        Music: 1,
+        Mystery: 1,
+        Romance: 1,
+        "Science Fiction": 1,
+        "TV Movie": 1,
+        Thriller: 1,
+        War: 1,
+        Western: 1
+    })
+    const movies = req.body.movies
+    for (var movie of movies){
+        updateTaste(movie, taste)
+    }
+    await taste.save()
+    for (var movie of movies){
+        await makeMovieTaste(movie, taste)
+    }
+    const recommendMovies = await MovieTaste.aggregate([
+        { $sort: { taste: -1 } },
+        { $limit: 3 }
+    ])
+    res.json(recommendMovies)
+})
 
 app.listen(port, () => {
     console.log(`Server running on port ${port}`)

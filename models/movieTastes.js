@@ -44,6 +44,11 @@ const movieSchema = new mongoose.Schema({
   vote_count: { type: Number }
 })
 
-const Movie = mongoose.model('Movie', movieSchema)
+const movieTasteSchema = new mongoose.Schema({
+  taste: { type: Number, required: true },
+  movie: { type: movieSchema, required: true }
+})
 
-module.exports = Movie
+const MovieTaste = mongoose.model('MovieTaste', movieTasteSchema)
+
+module.exports = MovieTaste
