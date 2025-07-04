@@ -61,6 +61,16 @@ app.get('/top6', async (req, res) => {
     res.json(topMovies)
 })
 
+app.post('/movies', async(req, res) => {
+    try{
+        const movie = new Movie(req.body)
+        const savedMovie = await movie.save()
+        res.status(201).json(savedMovie)
+    } catch(err) {
+        res.status(400).json({error: err.message})
+    }
+})
+
 
 app.listen(port, () => {
     console.log(`Server running on port ${port}`)

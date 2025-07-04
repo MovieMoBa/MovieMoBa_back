@@ -41,7 +41,8 @@ const movieSchema = new mongoose.Schema({
   title: { type: String },
   video: { type: Boolean },
   vote_average: { type: Number },
-  vote_count: { type: Number }
+  vote_count: { type: Number },
+  pick: { type: Number }
 })
 
 const Movie = mongoose.model('Movie', movieSchema)
