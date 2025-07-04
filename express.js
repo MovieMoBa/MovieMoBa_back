@@ -51,6 +51,15 @@ app.get('/reviews/:movieID/average', async(req, res) => {
     res.json({"average" : `${average}`})
 })
 
+app.get('/top5', async (req, res) => {
+    const topMovies = await Review.aggregate([
+        { $group: { _id: "$movieID", reviewCount: { $sum: 1 } } },
+        { $sort: { reviewCount: -1 } },
+        { $limit: 5 }
+    ])
+    res.json(topMovies)
+})
+
 
 app.listen(port, () => {
     console.log(`Server running on port ${port}`)
