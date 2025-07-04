@@ -10,6 +10,7 @@ const mongoose = require('mongoose')
 const url = "mongodb+srv://tlatamus0203:3PV3ZAuEL6MrXkfr@cluster23.cyyuqox.mongodb.net/?retryWrites=true&w=majority&appName=Cluster23"
 
 const Review = require('./models/reviews')
+const Movie = require('./models/movies')
 
 mongoose.connect(url)
     .then(() => console.log('MongoDB connected'))
