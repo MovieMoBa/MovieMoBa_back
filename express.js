@@ -51,11 +51,11 @@ app.get('/reviews/:movieID/average', async(req, res) => {
     res.json({"average" : `${average}`})
 })
 
-app.get('/top5', async (req, res) => {
+app.get('/top6', async (req, res) => {
     const topMovies = await Review.aggregate([
         { $group: { _id: "$movieID", reviewCount: { $sum: 1 } } },
         { $sort: { reviewCount: -1 } },
-        { $limit: 5 }
+        { $limit: 6 }
     ])
     res.json(topMovies)
 })
