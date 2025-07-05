@@ -20,7 +20,7 @@ function updateTaste(movie, taste) {
     movie.genres.forEach(genreObj => {
       const genreName = genreObj.name
       if (genreName in taste) {
-        taste[genreName] += 1
+        taste[genreName] += 3
       }
     })
   }
@@ -106,6 +106,7 @@ app.get('/movies/delete', async (req, res) => {
 
 app.get('/movies/recommend', async (req, res) => {
     await MovieTaste.deleteMany({})
+    await Taste.deleteMany({})
     const taste = new Taste({
         Action: 1,
         Adventure: 1,
@@ -140,6 +141,22 @@ app.get('/movies/recommend', async (req, res) => {
         { $limit: 3 }
     ])
     res.json(recommendMovies)
+})
+
+app.get('/movies/howabout', async (req, res) => {
+    const taste = await Taste.findOne()
+    console.log(taste)
+
+    const { _id, __v, ...tasteOnly } = taste._doc
+    console.log(tasteOnly)
+    const tasteOnlyEntries = Object.entries(tasteOnly).sort((a,b) => b[1] - a[1])
+
+    const first = tasteOnlyEntries[0]
+    const second = tasteOnlyEntries[1]
+    const eighth = tasteOnlyEntries[7]
+    const ninth = tasteOnlyEntries[8] 
+
+    res.json({like : [first, second], soso : [eighth, ninth]})
 })
 
 app.listen(port, () => {
