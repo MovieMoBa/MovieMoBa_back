@@ -15,6 +15,9 @@ const Taste = require('./models/tastes')
 const MovieTaste = require('./models/movieTastes')
 // 처음 실행 전 반드시 movie/movieTaste 데이터 wipe 후 이용!!
 
+var likes = []
+var prevQuestions = []
+
 function updateTaste(movie, taste) {
   if (movie.genres && Array.isArray(movie.genres)) {
     movie.genres.forEach(genreObj => {
@@ -24,6 +27,8 @@ function updateTaste(movie, taste) {
       }
     })
   }
+  likes.push(movie.title)
+  console.log(likes)
 }
 
 async function makeMovieTaste(movie, taste) {
@@ -145,10 +150,10 @@ app.get('/movies/recommend', async (req, res) => {
 
 app.get('/movies/howabout', async (req, res) => {
     const taste = await Taste.findOne()
-    console.log(taste)
+    // console.log(taste)
 
     const { _id, __v, ...tasteOnly } = taste._doc
-    console.log(tasteOnly)
+    // console.log(tasteOnly)
     const tasteOnlyEntries = Object.entries(tasteOnly).sort((a,b) => b[1] - a[1])
 
     const first = tasteOnlyEntries[0]
@@ -157,6 +162,22 @@ app.get('/movies/howabout', async (req, res) => {
     const ninth = tasteOnlyEntries[8] 
 
     res.json({like : [first, second], soso : [eighth, ninth]})
+})
+
+app.get('/ask', async (req, res) => {
+    const question = req.body.question
+    prevQuestions.push(question)
+
+    const movieLikes = "다음은 내가 좋아하는 영화들이야 : " + likes.join(", ")
+    const uptoPresent = prevQuestions.join(", ")
+    var fullQuestion = ""
+    if (likes.length>0){
+        fullQuestion = uptoPresent + movieLikes
+    }
+    else {
+        fullQuestion = uptoPresent
+    }
+    
 })
 
 app.listen(port, () => {
