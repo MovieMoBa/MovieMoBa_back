@@ -15,6 +15,8 @@ const Taste = require('./models/tastes')
 const MovieTaste = require('./models/movieTastes')
 // 처음 실행 전 반드시 movie/movieTaste 데이터 wipe 후 이용!!
 
+const { spawn } = require('child_process')
+
 var likes = []
 var prevQuestions = []
 
@@ -28,7 +30,6 @@ function updateTaste(movie, taste) {
     })
   }
   likes.push(movie.title)
-  console.log(likes)
 }
 
 async function makeMovieTaste(movie, taste) {
@@ -43,6 +44,31 @@ async function makeMovieTaste(movie, taste) {
     const movieTaste = new MovieTaste({taste : tasteRecord, movie : movie})
     const savedMovieTaste = await movieTaste.save()
   }
+}
+
+function askGemini(question) {
+  return new Promise((resolve, reject) => {
+    const py = spawn('python', ['./gemini.py', question])
+
+    let result = ''
+    let error = ''
+
+    py.stdout.on('data', (data) => {
+      result += data.toString()
+    })
+
+    py.stderr.on('data', (data) => {
+      error += data.toString()
+    })
+
+    py.on('close', (code) => {
+      if (code === 0) {
+        resolve(result)
+      } else {
+        reject(error || `Python process exited with code ${code}`)
+      }
+    })
+  })
 }
 
 mongoose.connect(url)
@@ -177,7 +203,12 @@ app.get('/ask', async (req, res) => {
     else {
         fullQuestion = uptoPresent
     }
-    
+    try {
+        const answer = await askGemini(fullQuestion);
+        res.json({answer : answer})
+    } catch (err) {
+        res.json({error : err})
+    }
 })
 
 app.listen(port, () => {

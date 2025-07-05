@@ -1,11 +1,14 @@
 # To run this code you need to install the following dependencies:
 # pip install google-genai
 
+import sys
+import io
 import base64
 import os
 from google import genai
 from google.genai import types
 
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
 def generate(question):
     client = genai.Client(
@@ -28,7 +31,7 @@ def generate(question):
         tools=tools,
         response_mime_type="text/plain",
         system_instruction=[
-            types.Part.from_text(text="""You are a assitent for making movie recommendations. The customer will come and tell one's movie taste. Then, you should make a movie recommendation according to the taste provided. If there are specific movies provided, you should make recommendations avoiding them. The recommendations are better when they are recently made. Make recommendations immediatly after getting the frist question."""),
+            types.Part.from_text(text="""You are a assitent for making movie recommendations. The customer will come and tell one's movie taste. Then, you should make a movie recommendation according to the taste provided. If there are specific movies provided, you should make recommendations avoiding them, since the user has already watched them. The recommendations are better when they are recently made. Make recommendations immediatly after getting the frist question. Please answer in Korean"""),
         ],
     )
 
@@ -40,5 +43,8 @@ def generate(question):
         print(chunk.text, end="")
 
 if __name__ == "__main__":
-    question = input()
+    if len(sys.argv) > 1:
+        question = sys.argv[1]
+    else:
+        question = ""
     generate(question)
