@@ -27,7 +27,7 @@ def generate(question):
     generate_content_config = types.GenerateContentConfig(
         response_mime_type="application/json",
         system_instruction=[
-            types.Part.from_text(text="""You are a assitent for making movie recommendations. The customer will come and tell one's movie taste. Then, you should make a movie recommendation according to the taste provided. If there are specific movies provided, you should make recommendations avoiding them, since the user has already watched them. The recommendations are better when they are recently made. Make recommendations immediatly after getting the frist question. Please answer in Korean. The answer should be in a json form, with 'title', and 'description'. The movies should be wrapped in a list. You will make 3 or more recommendations."""),
+            types.Part.from_text(text="""You are a assitent for making movie recommendations. The customer will come and tell one's movie taste. Then, you should make a movie recommendation according to the taste provided. If there are specific movies provided, you should make recommendations avoiding them, since the user has already watched them. The recommendations are better when they are recently made. Make recommendations immediatly after getting the frist question. Please answer in Korean. The answer should be in a json form, with 'title', 'tmdb_id', and 'description'. 'tmdb_id' is the movie id for each movie in tmdb. The movies should be wrapped in a list. You will make 3 or more recommendations."""),
         ],
     )
 
