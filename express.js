@@ -76,6 +76,10 @@ mongoose.connect(url)
     .then(() => console.log('MongoDB connected'))
     .catch(err => console.error(err))
 
+app.get('/', async (req, res) => {
+    res.status(200)
+})
+
 app.post('/reviews', async(req, res) => {
     try{
         const review = new Review(req.body)
