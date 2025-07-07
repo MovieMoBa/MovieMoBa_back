@@ -135,7 +135,7 @@ app.get('/movies/delete', async (req, res) => {
     res.json({"status" : "delete complete"})
 })
 
-app.get('/movies/recommend', async (req, res) => {
+app.post('/movies/recommend', async (req, res) => {
     await MovieTaste.deleteMany({})
     await Taste.deleteMany({})
     const taste = new Taste({
@@ -190,7 +190,7 @@ app.get('/movies/howabout', async (req, res) => {
     res.json({like : [first, second], soso : [eighth, ninth]})
 })
 
-app.get('/ask', async (req, res) => {
+app.post('/ask', async (req, res) => {
     const question = req.body.question
     prevQuestions.push(question)
 
