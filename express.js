@@ -204,8 +204,9 @@ app.post('/ask', async (req, res) => {
         fullQuestion = uptoPresent
     }
     try {
-        const answer = await askGemini(fullQuestion);
-        res.json({answer : answer})
+        const answer = await askGemini(fullQuestion)
+        const j_answer = JSON.parse(answer)
+        res.json({answer : j_answer})
     } catch (err) {
         res.json({error : err})
     }
