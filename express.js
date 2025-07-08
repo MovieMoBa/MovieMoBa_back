@@ -10,6 +10,9 @@ app.use(cors())
 const mongoose = require('mongoose')
 const url = "mongodb+srv://tlatamus0203:3PV3ZAuEL6MrXkfr@cluster23.cyyuqox.mongodb.net/?retryWrites=true&w=majority&appName=Cluster23"
 
+const fs = require('fs')
+const path = require('path')
+
 const Review = require('./models/reviews')
 const Movie = require('./models/movies')
 const Taste = require('./models/tastes')
@@ -19,7 +22,6 @@ const MovieTaste = require('./models/movieTastes')
 const { spawn } = require('child_process')
 
 var likes = []
-var prevQuestions = []
 
 function updateTaste(movie, taste) {
   if (movie.genres && Array.isArray(movie.genres)) {
@@ -197,19 +199,21 @@ app.get('/movies/howabout', async (req, res) => {
 
 app.post('/ask', async (req, res) => {
     const question = req.body.question
-    prevQuestions.push(question)
 
     const movieLikes = "다음은 내가 좋아하는 영화들이야 : " + likes.join(", ")
-    const uptoPresent = prevQuestions.join(", ")
     var fullQuestion = ""
     if (likes.length>0){
-        fullQuestion = uptoPresent + movieLikes
+        fullQuestion = question + movieLikes
     }
     else {
-        fullQuestion = uptoPresent
+        fullQuestion = question
     }
+
+    const questionFilePath = path.join(__dirname, 'gemini_input.txt')
+    fs.writeFileSync(questionFilePath, fullQuestion, 'utf8')
+    
     try {
-        const answer = await askGemini(fullQuestion)
+        const answer = await askGemini(questionFilePath)
         const j_answer = JSON.parse(answer)
         res.json({answer : j_answer})
     } catch (err) {
