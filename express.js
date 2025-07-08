@@ -10,9 +10,6 @@ app.use(cors())
 const mongoose = require('mongoose')
 const url = "mongodb+srv://tlatamus0203:3PV3ZAuEL6MrXkfr@cluster23.cyyuqox.mongodb.net/?retryWrites=true&w=majority&appName=Cluster23"
 
-const fs = require('fs')
-const path = require('path')
-
 const Review = require('./models/reviews')
 const Movie = require('./models/movies')
 const Taste = require('./models/tastes')
@@ -208,12 +205,9 @@ app.post('/ask', async (req, res) => {
     else {
         fullQuestion = question
     }
-
-    const questionFilePath = path.join(__dirname, 'gemini_input.txt')
-    fs.writeFileSync(questionFilePath, fullQuestion, 'utf8')
     
     try {
-        const answer = await askGemini(questionFilePath)
+        const answer = await askGemini(question)
         const j_answer = JSON.parse(answer)
         res.json({answer : j_answer})
     } catch (err) {
